@@ -15,7 +15,7 @@ type beerByID struct {
 	auth *auth.User
 
 	URLParams struct {
-		BeerID uint64 `url:"id"`
+		BeerID int `url:"id"`
 	}
 }
 

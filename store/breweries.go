@@ -1,7 +1,7 @@
 package store
 
-import "github.com/jmoiron/sqlx"
+import "database/sql"
 
-func NewBreweries(db *sqlx.DB) Breweries {
+func NewBreweries(db *sql.DB) Breweries {
 	return nil
 }

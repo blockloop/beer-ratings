@@ -33,3 +33,17 @@ func (f *Factory) GetBeerByID(c boar.Context) (boar.Handler, error) {
 		log: f.log,
 	}, nil
 }
+
+func (f *Factory) CreateUser(c boar.Context) (boar.Handler, error) {
+	return &createUser{
+		db:  f.users,
+		log: f.log,
+	}, nil
+}
+
+func (f *Factory) GetUserByID(c boar.Context) (boar.Handler, error) {
+	return &userByID{
+		db:  f.users,
+		log: f.log,
+	}, nil
+}

@@ -2,6 +2,12 @@
 
 
 [[projects]]
+  name = "github.com/Masterminds/squirrel"
+  packages = ["."]
+  revision = "a6b93000bd219143c56c16e6cb1c4b91da3f224b"
+  version = "v1.0"
+
+[[projects]]
   name = "github.com/apex/log"
   packages = ["."]
   revision = "0296d6eb16bb28f8a0c55668affcf4876dc269be"
@@ -17,7 +23,7 @@
   branch = "master"
   name = "github.com/blockloop/boar"
   packages = [".","bind"]
-  revision = "ee36f6f9b4144392879b401d990909b455887252"
+  revision = "2b73a714866d64c7f5f0f3f23ed9dd4df4cf0ead"
 
 [[projects]]
   branch = "master"
@@ -26,16 +32,22 @@
   revision = "e6c82218a8b3ed3cbeb5407429849c0b0b597d40"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/jmoiron/sqlx"
-  packages = [".","reflectx"]
-  revision = "3379e5993990b1f927fc8db926485e6f6becf2d2"
-
-[[projects]]
   name = "github.com/julienschmidt/httprouter"
   packages = ["."]
   revision = "8c199fb6259ffc1af525cc3ad52ee60ba8359669"
   version = "v1.1"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lann/builder"
+  packages = ["."]
+  revision = "f22ce00fd9394014049dad11c244859432bd6820"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/lann/ps"
+  packages = ["."]
+  revision = "62de8c46ede02a7675c4c79c84883eb164cb71e3"
 
 [[projects]]
   name = "github.com/mattn/go-sqlite3"
@@ -44,10 +56,22 @@
   version = "v1.4.0"
 
 [[projects]]
+  name = "github.com/pborman/uuid"
+  packages = ["."]
+  revision = "e790cca94e6cc75c7064b1332e63811d4aae1a53"
+  version = "v1.1"
+
+[[projects]]
   name = "github.com/pkg/errors"
   packages = ["."]
   revision = "645ef00459ed84a119197bfb8d8205042c6df63d"
   version = "v0.8.0"
+
+[[projects]]
+  branch = "master"
+  name = "golang.org/x/crypto"
+  packages = ["bcrypt","blowfish"]
+  revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
 
 [[projects]]
   branch = "master"
@@ -58,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "44f86a1f3d839db515f74a2fde9896c84eee264587dc0a65f237f30be1c14ce9"
+  inputs-digest = "0e53d83cc4229af0b90f2e143a68bd1c00f5fd844d130d435f5ae5acaea58bf2"
   solver-name = "gps-cdcl"
   solver-version = 1

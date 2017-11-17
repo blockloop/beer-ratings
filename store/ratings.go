@@ -1,7 +1,7 @@
 package store
 
-import "github.com/jmoiron/sqlx"
+import "database/sql"
 
-func NewRatings(db *sqlx.DB) Ratings {
+func NewRatings(db *sql.DB) Ratings {
 	return nil
 }

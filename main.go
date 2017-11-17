@@ -1,26 +1,39 @@
 package main
 
 import (
+	"context"
+	"database/sql"
+	"io/ioutil"
 	"net/http"
 	"time"
 
-	"github.com/apex/log"
 	"github.com/blockloop/boar"
 	"github.com/blockloop/boar-example/handlers"
 	"github.com/blockloop/boar-example/store"
-	"github.com/jmoiron/sqlx"
 
+	"github.com/apex/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
 	log := log.WithField("app", "beer-ratings")
 
-	db, err := sqlx.Open("sqlite3", ":memory:")
+	db, err := sql.Open("sqlite3", ":memory:")
 	if err != nil {
 		log.WithError(err).Fatal("could not connect to datastore")
 	}
-	db = db.Unsafe()
+
+	schema, err := ioutil.ReadFile("./schema.sql")
+	if err != nil {
+		log.WithError(err).Fatal("could not read schema file")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	_, err = db.ExecContext(ctx, string(schema))
+	cancel()
+	if err != nil {
+		log.WithError(err).Fatal("failed to build schema")
+	}
 
 	factory := handlers.NewFactory(
 		store.NewRatings(db),
@@ -32,6 +45,8 @@ func main() {
 
 	r := boar.NewRouter()
 	r.Get("/beers/:id", factory.GetBeerByID)
+	r.Post("/users", factory.CreateUser)
+	r.Get("/users/:id", factory.GetUserByID)
 
 	r.MethodFunc(http.MethodGet, "/ping", func(c boar.Context) error {
 		return c.WriteJSON(http.StatusOK, boar.JSON{
@@ -41,5 +56,6 @@ func main() {
 
 	addr := ":3000"
 	log.WithField("addr", addr).Info("listening")
-	log.WithError(r.ListenAndServe(addr)).Info("application exit")
+	err = http.ListenAndServe(addr, r.RealRouter())
+	log.WithError(err).Info("application exit")
 }
