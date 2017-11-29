@@ -1,11 +1,14 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/apex/log"
 	"github.com/blockloop/boar"
 	"github.com/blockloop/boar-example/auth"
 	"github.com/blockloop/boar-example/store"
 	"github.com/pborman/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // Factory is a builder for handlers
@@ -74,13 +77,23 @@ func (f *Factory) auth(c boar.Context) (*auth.User, error) {
 	if !ok {
 		return nil, nil
 	}
-	user, err := f.users.LookupByEmailAndPassword(c.Context(), u, p)
+
+	user, err := f.users.LookupByEmail(c.Context(), u)
 	if err != nil {
 		return nil, err
 	}
 
 	if user == nil {
 		return nil, nil
+	}
+
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(p)); err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword {
+			f.log.Info("invalid password attempt")
+			return nil, nil
+		}
+
+		return nil, fmt.Errorf("could not compare password: %v", err)
 	}
 
 	return &auth.User{ID: user.ID}, nil

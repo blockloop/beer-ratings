@@ -22,17 +22,20 @@ type createUser struct {
 
 	Body struct {
 		Email           string `json:"email" valid:"email"`
-		Password        []byte `json:"password" valid:"required"`
-		PasswordConfirm []byte `json:"password_confirm" valid:"required"`
+		Password        string `json:"password" valid:"required"`
+		PasswordConfirm string `json:"password_confirm" valid:"required"`
 	}
 }
 
 func (h *createUser) Handle(c boar.Context) error {
-	if !bytes.Equal(h.Body.Password, h.Body.PasswordConfirm) {
+	password := []byte(h.Body.Password)
+	passwordConfirm := []byte(h.Body.PasswordConfirm)
+
+	if !bytes.Equal(password, passwordConfirm) {
 		return boar.NewHTTPError(http.StatusBadRequest, errPasswordMismatch)
 	}
 
-	hash, err := bcrypt.GenerateFromPassword(h.Body.Password, bcrypt.DefaultCost)
+	hash, err := bcrypt.GenerateFromPassword(password, bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("could not bcrypt password: %v", err)
 	}

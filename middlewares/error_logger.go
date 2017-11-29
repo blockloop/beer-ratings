@@ -14,6 +14,11 @@ func ErrorLogger(ll log.Interface) boar.Middleware {
 			if err == nil {
 				return nil
 			}
+			if httperr, ok := err.(boar.HTTPError); ok {
+				if httperr.Status() < 499 {
+					return nil
+				}
+			}
 
 			ll.WithError(err).Error("an error occurred")
 

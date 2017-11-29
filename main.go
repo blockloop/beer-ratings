@@ -34,7 +34,7 @@ func main() {
 	r := boar.NewRouter()
 
 	r.Use(middlewares.ErrorLogger(ll))
-	r.Use(boar.PanicMiddleware)
+	// r.Use(boar.PanicMiddleware)
 	r.Use(middlewares.JSONOnly)
 	r.Use(middlewares.HTTPLogger(ll))
 

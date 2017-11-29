@@ -23,7 +23,7 @@ type breweries struct {
 	log log.Interface
 }
 
-func (b *breweries) Create(context.Context, models.Brewery) error {
+func (b *breweries) Create(context.Context, models.Brewery) (*models.Brewery, error) {
 	panic("not implemented")
 }
 

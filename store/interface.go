@@ -23,7 +23,7 @@ type Ratings interface {
 
 // Beers is a datastore that holds beers
 type Beers interface {
-	Create(context.Context, models.Beer) error
+	Create(context.Context, models.Beer) (*models.Beer, error)
 	Search(context.Context, string) ([]*models.Beer, *models.Pagination, error)
 	ForBrewery(ctx context.Context, breweryID int) ([]*models.Beer, *models.Pagination, error)
 	Get(ctx context.Context, id int) (*models.Beer, error)
@@ -32,7 +32,7 @@ type Beers interface {
 
 // Breweries is a datastore that holds beers
 type Breweries interface {
-	Create(context.Context, models.Brewery) error
+	Create(context.Context, models.Brewery) (*models.Brewery, error)
 	Search(context.Context, string) ([]*models.Brewery, *models.Pagination, error)
 	ForBeer(ctx context.Context, beerID int) (*models.Brewery, error)
 	Get(ctx context.Context, id int) (*models.Brewery, error)

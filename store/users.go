@@ -27,7 +27,24 @@ type users struct {
 }
 
 func (u *users) LookupByEmail(ctx context.Context, email string) (*models.User, error) {
-	panic("not implemented")
+	rows, err := sq.Select("*").
+		From("users").
+		Where(sq.Eq{"email": email}).
+		RunWith(u.db).
+		QueryContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not execute query: %v", err)
+	}
+
+	var user models.User
+	if err := scan.Row(&user, rows); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("could not scan row: %v", err)
+	}
+
+	return &user, nil
 }
 
 func (u *users) LookupByID(ctx context.Context, id int) (*models.User, error) {
@@ -42,7 +59,7 @@ func (u *users) LookupByID(ctx context.Context, id int) (*models.User, error) {
 		From("users").
 		Where("id = $1", id).
 		RunWith(u.db).
-		Query()
+		QueryContext(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("could not select from db: %v", err)
 	}
@@ -60,7 +77,24 @@ func (u *users) LookupByID(ctx context.Context, id int) (*models.User, error) {
 }
 
 func (u *users) LookupByEmailAndPassword(ctx context.Context, email string, passwordHash string) (*models.User, error) {
-	panic("not implemented")
+	rows, err := sq.Select("*").
+		From("users").
+		Where(sq.Eq{"email": email, "password_hash": passwordHash}).
+		RunWith(u.db).
+		QueryContext(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("could not execute query: %v", err)
+	}
+
+	var user models.User
+	if err := scan.Row(&user, rows); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("could not scan row: %v", err)
+	}
+
+	return &user, nil
 }
 
 func (u *users) Create(ctx context.Context, email string, passwordHash string) (*models.User, error) {

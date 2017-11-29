@@ -45,9 +45,10 @@ func (h *createBeer) Handle(c boar.Context) error {
 		UUID:      uuid.New(),
 	}
 
-	if err := h.beers.Create(c.Context(), beer); err != nil {
+	newBeer, err := h.beers.Create(c.Context(), beer)
+	if err != nil {
 		return err
 	}
 
-	return c.WriteJSON(http.StatusCreated, beer)
+	return c.WriteJSON(http.StatusCreated, newBeer)
 }

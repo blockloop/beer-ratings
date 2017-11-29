@@ -23,13 +23,13 @@
   branch = "master"
   name = "github.com/blockloop/boar"
   packages = [".","bind"]
-  revision = "fc7f7a8be84257a019ff7a16f26504403bb1368d"
+  revision = "77fea71d328d2093dc2e12edba8e37352f62bb36"
 
 [[projects]]
   branch = "master"
   name = "github.com/blockloop/scan"
   packages = ["."]
-  revision = "734400de580940cb8039be3408f34dbf3aaac558"
+  revision = "71059cd1003c1ce5f63f71e1c4caa56cdd848fb4"
 
 [[projects]]
   branch = "master"
