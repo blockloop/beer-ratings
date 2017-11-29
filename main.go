@@ -7,44 +7,45 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/blockloop/boar"
 	"github.com/blockloop/boar-example/handlers"
+	"github.com/blockloop/boar-example/middlewares"
 	"github.com/blockloop/boar-example/store"
 
-	"github.com/apex/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	log := log.WithField("app", "beer-ratings")
-
-	db, err := sql.Open("sqlite3", ":memory:")
+	ll := log.Log
+	db, err := connectDB()
 	if err != nil {
-		log.WithError(err).Fatal("could not connect to datastore")
-	}
-
-	schema, err := ioutil.ReadFile("./schema.sql")
-	if err != nil {
-		log.WithError(err).Fatal("could not read schema file")
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	_, err = db.ExecContext(ctx, string(schema))
-	cancel()
-	if err != nil {
-		log.WithError(err).Fatal("failed to build schema")
+		ll.WithError(err).Fatal("failed to connect to db")
 	}
 
 	factory := handlers.NewFactory(
 		store.NewRatings(db),
-		store.NewUsers(db),
+		store.NewUsers(db, ll),
 		store.NewBeers(db),
-		store.NewBreweries(db),
-		log,
+		store.NewBreweries(db, ll),
+		ll,
 	)
 
 	r := boar.NewRouter()
+
+	r.Use(middlewares.ErrorLogger(ll))
+	r.Use(boar.PanicMiddleware)
+	r.Use(middlewares.JSONOnly)
+	r.Use(middlewares.HTTPLogger(ll))
+
+	/// ROUTES
+
+	// Beers
 	r.Get("/beers/:id", factory.GetBeerByID)
+	r.Post("/brewery/:brewery_id/beers", factory.CreateBeer)
+	// r.Get("/brewery/:brewery_id/beers/:id", factory.GetBeer)
+
+	// Users
 	r.Post("/users", factory.CreateUser)
 	r.Get("/users/:id", factory.GetUserByID)
 
@@ -54,8 +55,29 @@ func main() {
 		})
 	})
 
+	/// LISTEN
 	addr := ":3000"
-	log.WithField("addr", addr).Info("listening")
+	ll.WithField("addr", addr).Info("listening")
 	err = http.ListenAndServe(addr, r.RealRouter())
-	log.WithError(err).Info("application exit")
+	ll.WithError(err).Info("application exit")
+}
+
+func connectDB() (*sql.DB, error) {
+	db, err := sql.Open("sqlite3", ":memory:")
+	if err != nil {
+		return nil, err
+	}
+
+	schema, err := ioutil.ReadFile("./schema.sql")
+	if err != nil {
+		return nil, err
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	_, err = db.ExecContext(ctx, string(schema))
+	cancel()
+	if err != nil {
+		return nil, err
+	}
+	return db, nil
 }

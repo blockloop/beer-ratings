@@ -7,6 +7,7 @@ import (
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/blockloop/boar-example/models"
+	"github.com/blockloop/scan"
 )
 
 func NewBeers(db *sql.DB) Beers {
@@ -33,17 +34,20 @@ func (b *beers) ForBrewery(ctx context.Context, breweryID int) ([]*models.Beer, 
 
 func (b *beers) Get(ctx context.Context, id int) (*models.Beer, error) {
 	var beer models.Beer
-	row := sq.Select("id, name, brewery_id").
+	rows, err := sq.Select("id, name, brewery_id").
 		From("beers").
 		Where("id = ?", id).
 		RunWith(b.db).
-		QueryRow()
+		Query()
+	if err != nil {
+		return nil, fmt.Errorf("could not execute query: %v", err)
+	}
 
-	if err := row.Scan(&beer.ID, &beer.Name, &beer.BreweryID); err != nil {
+	if err := scan.Row(beer, rows); err != nil {
 		if err == sql.ErrNoRows {
 			return nil, nil
 		}
-		return nil, fmt.Errorf("scan row failed for selecting beer id %d: %v", row, err)
+		return nil, fmt.Errorf("scan row failed for selecting beer id %d: %v", id, err)
 	}
 
 	return &beer, nil

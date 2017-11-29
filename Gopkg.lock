@@ -23,7 +23,13 @@
   branch = "master"
   name = "github.com/blockloop/boar"
   packages = [".","bind"]
-  revision = "2b73a714866d64c7f5f0f3f23ed9dd4df4cf0ead"
+  revision = "fc7f7a8be84257a019ff7a16f26504403bb1368d"
+
+[[projects]]
+  branch = "master"
+  name = "github.com/blockloop/scan"
+  packages = ["."]
+  revision = "734400de580940cb8039be3408f34dbf3aaac558"
 
 [[projects]]
   branch = "master"
@@ -77,11 +83,11 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context"]
-  revision = "9dfe39835686865bff950a07b394c12a98ddc811"
+  revision = "c7086645de248775cbf2373cf5ca4d2fa664b8c1"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "0e53d83cc4229af0b90f2e143a68bd1c00f5fd844d130d435f5ae5acaea58bf2"
+  inputs-digest = "ca14431fd59442bb443c666e8762af0247b35624e43f3761e79737b1e6854432"
   solver-name = "gps-cdcl"
   solver-version = 1

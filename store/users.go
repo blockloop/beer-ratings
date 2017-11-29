@@ -6,20 +6,24 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/blockloop/boar-example/models"
+	"github.com/blockloop/scan"
 
 	sq "github.com/Masterminds/squirrel"
 	"github.com/pborman/uuid"
 )
 
-func NewUsers(db *sql.DB) Users {
+func NewUsers(db *sql.DB, log log.Interface) Users {
 	return &users{
-		db: db,
+		db:  db,
+		log: log,
 	}
 }
 
 type users struct {
-	db *sql.DB
+	db  *sql.DB
+	log log.Interface
 }
 
 func (u *users) LookupByEmail(ctx context.Context, email string) (*models.User, error) {
@@ -27,25 +31,28 @@ func (u *users) LookupByEmail(ctx context.Context, email string) (*models.User, 
 }
 
 func (u *users) LookupByID(ctx context.Context, id int) (*models.User, error) {
-	row := sq.Select("id,uuid,username,email,address_line_1,address_line_2,city,state,country,postal_code").
+	defer func(start time.Time) {
+		log.WithFields(log.Fields{
+			"query.name":     "find_user_by_id",
+			"query.duration": time.Since(start).Nanoseconds(),
+		}).Info("query duration")
+	}(time.Now())
+
+	rows, err := sq.Select("*").
 		From("users").
 		Where("id = $1", id).
 		RunWith(u.db).
-		QueryRow()
+		Query()
+	if err != nil {
+		return nil, fmt.Errorf("could not select from db: %v", err)
+	}
 
-	user := models.User{Address: &models.Address{}}
-	if err := row.Scan(
-		&user.ID,
-		&user.UUID,
-		&user.Username,
-		&user.Email,
-		&user.Address.Line1,
-		&user.Address.Line2,
-		&user.Address.City,
-		&user.Address.State,
-		&user.Address.Country,
-		&user.Address.PostalCode,
-	); err != nil {
+	var user models.User
+	err = scan.Row(&user, rows)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, fmt.Errorf("could not scan row: %+v", err)
 	}
 

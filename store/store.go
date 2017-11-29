@@ -6,7 +6,10 @@ import (
 )
 
 var (
-	ErrEmailTaken    = errors.New("email is already in use")
+	// ErrEmailTaken is an error indicating that the email address is already in use
+	ErrEmailTaken = errors.New("email is already in use")
+
+	// ErrUsernameTaken is an error indicating that the username address is already in use
 	ErrUsernameTaken = errors.New("username is already in use")
 )
 
