@@ -26,16 +26,8 @@
   version = "1.0.0"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/blockloop/boar"
-
-[[constraint]]
   name = "github.com/mattn/go-sqlite3"
   version = "1.4.0"
-
-[[constraint]]
-  name = "github.com/shawntoffel/darksky"
-  version = "1.0.4"
 
 [[constraint]]
   name = "github.com/pkg/errors"
@@ -46,5 +38,5 @@
   version = "1.0.0"
 
 [[constraint]]
-  branch = "master"
   name = "github.com/blockloop/scan"
+  version = "1.1.0"

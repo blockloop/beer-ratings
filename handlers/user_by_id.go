@@ -4,8 +4,8 @@ import (
 	"net/http"
 
 	"github.com/apex/log"
-	"github.com/blockloop/boar"
-	"github.com/blockloop/boar-example/store"
+	"github.com/blockloop/beer_ratings/store"
+	"github.com/blockloop/tea"
 )
 
 type userByID struct {
@@ -13,21 +13,29 @@ type userByID struct {
 	log log.Interface
 
 	URLParams struct {
-		ID int `url:"id" valid:"required"`
+		ID int64 `url:"id" valid:"required"`
 	}
 }
 
-func (u *userByID) Handle(c boar.Context) error {
-	user, err := u.db.LookupByID(c.Context(), u.URLParams.ID)
-	if err != nil {
-		u.log.WithError(err).WithField("user.id", u.URLParams.ID).
-			Error("failed to find user by ID")
-		return err
-	}
+func UserByIDHandler(db store.Users) http.HandlerFunc {
+	fn := func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
+		userID, err := tea.URLInt64(r, "id", "required")
+		if err != nil {
+			return tea.Errorf(400, "bad request: %+v", err)
+		}
 
-	if user == nil {
-		return boar.ErrEntityNotFound
-	}
+		user, err := db.LookupByID(r.Context(), userID)
+		if err != nil {
+			tea.Logger(r).WithError(err).WithField("user.id", userID).
+				Error("failed to find user by ID")
+			return tea.StatusError(500)
+		}
 
-	return c.WriteJSON(http.StatusOK, user)
+		if user == nil {
+			return tea.Error(404, "user not found")
+		}
+
+		return 200, user
+	}
+	return tea.Handler(fn)
 }

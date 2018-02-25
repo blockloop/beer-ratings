@@ -5,65 +5,61 @@ import (
 	"database/sql"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/apex/log"
-	"github.com/blockloop/boar"
-	"github.com/blockloop/boar-example/handlers"
-	"github.com/blockloop/boar-example/middlewares"
-	"github.com/blockloop/boar-example/store"
+	"github.com/blockloop/beer_ratings/handlers"
+	"github.com/blockloop/beer_ratings/store"
+	"github.com/blockloop/tea"
+	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/middleware"
+	"github.com/go-chi/render"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
 	ll := log.Log
-	db, err := connectDB()
+	db, err := connectDB(os.Getenv("DB"))
 	if err != nil {
 		ll.WithError(err).Fatal("failed to connect to db")
 	}
 
-	factory := handlers.NewFactory(
-		store.NewRatings(db),
-		store.NewUsers(db, ll),
-		store.NewBeers(db),
-		store.NewBreweries(db, ll),
-		ll,
+	// always render JSON
+	tea.Responder = render.JSON
+
+	mux := chi.NewMux()
+	mux.Use(
+		middleware.RequestID,
+		middleware.RealIP,
+		middleware.Logger,
+		tea.LoggerMiddleware,
+		middleware.Recoverer,
 	)
 
-	r := boar.NewRouter()
+	mux.Mount("/debug", middleware.Profiler())
 
-	r.Use(middlewares.ErrorLogger(ll))
-	// r.Use(boar.PanicMiddleware)
-	r.Use(middlewares.JSONOnly)
-	r.Use(middlewares.HTTPLogger(ll))
+	stores := store.NewStores(db)
+	handlers.Register(mux, stores)
 
-	/// ROUTES
+	// make error handlers write JSON
+	mux.NotFound(tea.NotFound)
+	mux.MethodNotAllowed(tea.MethodNotAllowed)
 
-	// Beers
-	r.Get("/beers/:id", factory.GetBeerByID)
-	r.Post("/brewery/:brewery_id/beers", factory.CreateBeer)
-	// r.Get("/brewery/:brewery_id/beers/:id", factory.GetBeer)
-
-	// Users
-	r.Post("/users", factory.CreateUser)
-	r.Get("/users/:id", factory.GetUserByID)
-
-	r.MethodFunc(http.MethodGet, "/ping", func(c boar.Context) error {
-		return c.WriteJSON(http.StatusOK, boar.JSON{
-			"pong": time.Now(),
-		})
-	})
-
-	/// LISTEN
 	addr := ":3000"
 	ll.WithField("addr", addr).Info("listening")
-	err = http.ListenAndServe(addr, r.RealRouter())
+
+	err = http.ListenAndServe(addr, mux)
 	ll.WithError(err).Info("application exit")
 }
 
-func connectDB() (*sql.DB, error) {
-	db, err := sql.Open("sqlite3", ":memory:")
+func connectDB(dsn string) (*sql.DB, error) {
+	if len(dsn) == 0 {
+		dsn = "file::memory:?mode=memory&cache=shared"
+	}
+
+	db, err := sql.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, err
 	}
@@ -79,5 +75,6 @@ func connectDB() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return db, nil
 }

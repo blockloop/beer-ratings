@@ -14,34 +14,46 @@
   version = "v1.0.0"
 
 [[projects]]
-  name = "github.com/asaskevich/govalidator"
-  packages = ["."]
-  revision = "73945b6115bfbbcc57d89b7316e28109364124e1"
-  version = "v7"
-
-[[projects]]
-  branch = "master"
-  name = "github.com/blockloop/boar"
-  packages = [".","bind"]
-  revision = "77fea71d328d2093dc2e12edba8e37352f62bb36"
-
-[[projects]]
-  branch = "master"
   name = "github.com/blockloop/scan"
   packages = ["."]
-  revision = "71059cd1003c1ce5f63f71e1c4caa56cdd848fb4"
+  revision = "197a585612f316d9fa51d35619b2fd280cd36f6b"
+  version = "v1.2.0"
 
 [[projects]]
-  branch = "master"
-  name = "github.com/gorilla/schema"
+  name = "github.com/blockloop/tea"
   packages = ["."]
-  revision = "e6c82218a8b3ed3cbeb5407429849c0b0b597d40"
+  revision = "04b6db36e70b9942e1ae7830e78e3ace934d6a52"
+  version = "v1.1.1"
 
 [[projects]]
-  name = "github.com/julienschmidt/httprouter"
+  name = "github.com/go-chi/chi"
+  packages = [
+    ".",
+    "middleware"
+  ]
+  revision = "e83ac2304db3c50cf03d96a2fcd39009d458bc35"
+  version = "v3.3.2"
+
+[[projects]]
+  name = "github.com/go-chi/render"
   packages = ["."]
-  revision = "8c199fb6259ffc1af525cc3ad52ee60ba8359669"
-  version = "v1.1"
+  revision = "9f855fadd4b8cde7773f9ef51f6b2705af239519"
+  version = "v1.0.0"
+
+[[projects]]
+  name = "github.com/go-playground/locales"
+  packages = [
+    ".",
+    "currency"
+  ]
+  revision = "e4cbcb5d0652150d40ad0646651076b6bd2be4f6"
+  version = "v0.11.2"
+
+[[projects]]
+  name = "github.com/go-playground/universal-translator"
+  packages = ["."]
+  revision = "b32fa301c9fe55953584134cb6853a13c87ec0a1"
+  version = "v0.16.0"
 
 [[projects]]
   branch = "master"
@@ -76,7 +88,10 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["bcrypt","blowfish"]
+  packages = [
+    "bcrypt",
+    "blowfish"
+  ]
   revision = "9f005a07e0d31d45e6656d241bb5c0f2efd4bc94"
 
 [[projects]]
@@ -85,9 +100,15 @@
   packages = ["context"]
   revision = "c7086645de248775cbf2373cf5ca4d2fa664b8c1"
 
+[[projects]]
+  name = "gopkg.in/go-playground/validator.v9"
+  packages = ["."]
+  revision = "150fe5b6a4ccc9cd6ffdbf5d184b67fbea75efcc"
+  version = "v9.11.0"
+
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "ca14431fd59442bb443c666e8762af0247b35624e43f3761e79737b1e6854432"
+  inputs-digest = "17667a1ff616387a1ef1a07da10a5afe3d54e763c988439ed71ca0abf7d8ff8e"
   solver-name = "gps-cdcl"
   solver-version = 1

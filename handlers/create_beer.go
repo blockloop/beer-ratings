@@ -1,18 +1,15 @@
 package handlers
 
 import (
-	"errors"
 	"net/http"
 
 	"github.com/apex/log"
-	"github.com/blockloop/boar"
-	"github.com/blockloop/boar-example/auth"
-	"github.com/blockloop/boar-example/models"
-	"github.com/blockloop/boar-example/store"
+	"github.com/blockloop/beer_ratings/auth"
+	"github.com/blockloop/beer_ratings/models"
+	"github.com/blockloop/beer_ratings/store"
+	"github.com/blockloop/tea"
 	"github.com/pborman/uuid"
 )
-
-var errBreweryNotFound = errors.New("brewery not found")
 
 type createBeer struct {
 	beers     store.Beers
@@ -21,34 +18,49 @@ type createBeer struct {
 	auth      *auth.User
 
 	URLParams struct {
-		BreweryID int `url:"brewery_id"`
-	}
-
-	Body struct {
-		Name    string `json:"name" valid:"required"`
-		OwnerID int    `json:"owner_id" valid:"required"`
+		BreweryID int64 `url:"brewery_id"`
 	}
 }
 
-func (h *createBeer) Handle(c boar.Context) error {
-	brewery, err := h.breweries.Get(c.Context(), h.URLParams.BreweryID)
-	if err != nil {
-		return err
-	}
-	if brewery == nil {
-		return boar.NewHTTPError(http.StatusNotFound, errBreweryNotFound)
-	}
+type createBeerRequest struct {
+	Name    string `json:"name" valid:"required"`
+	OwnerID int64  `json:"owner_id" valid:"required"`
+}
 
-	beer := models.Beer{
-		BreweryID: brewery.ID,
-		Name:      h.Body.Name,
-		UUID:      uuid.New(),
-	}
+func CreateBeerHandler(beers store.Beers, breweries store.Breweries) http.HandlerFunc {
+	fn := func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
+		var req createBeerRequest
+		if err := tea.Body(r, req); err != nil {
+			return tea.Errorf(400, "bad request: %+v", err)
+		}
 
-	newBeer, err := h.beers.Create(c.Context(), beer)
-	if err != nil {
-		return err
-	}
+		breweryID, err := tea.URLInt64(r, "brewery_id", "required")
+		if err != nil {
+			return tea.Errorf(400, "bad request: brewery_id: %+v", err)
+		}
 
-	return c.WriteJSON(http.StatusCreated, newBeer)
+		brewery, err := breweries.Get(r.Context(), breweryID)
+		if err != nil {
+			tea.Logger(r).WithError(err).Error("failed to get brewery")
+			return tea.StatusError(500)
+		}
+		if brewery == nil {
+			return tea.Error(404, "brewery does not exist")
+		}
+
+		beer := models.Beer{
+			BreweryID: brewery.ID,
+			Name:      req.Name,
+			UUID:      uuid.New(),
+		}
+
+		newBeer, err := beers.Create(r.Context(), beer)
+		if err != nil {
+			tea.Logger(r).WithError(err).Error("failed to create beer")
+			return tea.StatusError(500)
+		}
+
+		return http.StatusCreated, newBeer
+	}
+	return tea.Handler(fn)
 }

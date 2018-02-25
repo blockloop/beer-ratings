@@ -14,9 +14,19 @@ CREATE TABLE IF NOT EXISTS users (
 	created DATETIME NOT NULL,
 	modified DATETIME NOT NULL
 );
-CREATE UNIQUE INDEX idx_users_username ON users(username);
-CREATE UNIQUE INDEX idx_users_email ON users(email);
-CREATE UNIQUE INDEX idx_users_uuid ON users(uuid);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_uuid ON users(uuid);
+
+INSERT INTO users (
+        uuid, username, email, password_hash, verified, created, modified
+)
+VALUES (
+        'a3edabe3-d4c3-4d70-930a-a29760442852', 'root', 'root@root.com',
+        -- password_hash => letmein
+        '$2a$10$gEygKg52dEkk1uekIHyz5.zqaRD8skzmi.Ma.9MTxaCPa0KdYANou',
+        1, DATETIME(), DATETIME()
+);
 
 CREATE TABLE IF NOT EXISTS breweries (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -34,9 +44,9 @@ CREATE TABLE IF NOT EXISTS breweries (
 	modified DATETIME NOT NULL,
 		FOREIGN KEY (owner_id) REFERENCES users (id)
 );
-CREATE UNIQUE INDEX idx_breweries_uuid ON breweries(uuid);
-CREATE INDEX idx_breweries_name ON breweries(name);
-CREATE INDEX idx_breweries_state ON breweries(state);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_breweries_uuid ON breweries(uuid);
+CREATE INDEX IF NOT EXISTS idx_breweries_name ON breweries(name);
+CREATE INDEX IF NOT EXISTS idx_breweries_state ON breweries(state);
 
 CREATE TABLE IF NOT EXISTS beers (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -48,8 +58,8 @@ CREATE TABLE IF NOT EXISTS beers (
 	modified DATETIME NOT NULL,
 		FOREIGN KEY (brewery_id) REFERENCES breweries (id)
 );
-CREATE UNIQUE INDEX idx_beers_uuid ON beers(uuid);
-CREATE UNIQUE INDEX idx_beers_name_brewery ON beers(name,brewery_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_beers_uuid ON beers(uuid);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_beers_name_brewery ON beers(name,brewery_id);
 
 CREATE TABLE IF NOT EXISTS ratings (
 	uuid VARCHAR(36) NOT NULL,
@@ -61,6 +71,6 @@ CREATE TABLE IF NOT EXISTS ratings (
 		FOREIGN KEY (user_id) REFERENCES users (id),
 		FOREIGN KEY (beer_id) REFERENCES beers (id)
 );
-CREATE UNIQUE INDEX idx_ratings_uuid ON ratings(uuid);
-CREATE INDEX idx_ratings_userid ON ratings(user_id);
-CREATE INDEX idx_ratings_beerid ON ratings(beer_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_ratings_uuid ON ratings(uuid);
+CREATE INDEX IF NOT EXISTS idx_ratings_userid ON ratings(user_id);
+CREATE INDEX IF NOT EXISTS idx_ratings_beerid ON ratings(beer_id);

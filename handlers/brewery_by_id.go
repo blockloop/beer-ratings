@@ -7,26 +7,26 @@ import (
 	"github.com/blockloop/tea"
 )
 
-func FindBeerHandler(db store.Beers) http.HandlerFunc {
+func FindBreweryHandler(db store.Breweries) http.HandlerFunc {
 	return tea.Handler(func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
 		id, err := tea.URLInt64(r, "id", "")
 		if err != nil {
 			return tea.StatusError(404)
 		}
 
-		return FindBeer(id, db, w, r)
+		return FindBrewery(id, db, w, r)
 	})
 }
 
-func FindBeer(id int64, db store.Beers, w http.ResponseWriter, r *http.Request) (int, interface{}) {
-	beer, err := db.Get(r.Context(), id)
+func FindBrewery(id int64, db store.Breweries, w http.ResponseWriter, r *http.Request) (int, interface{}) {
+	brewery, err := db.Get(r.Context(), id)
 	if err != nil {
-		tea.Logger(r).WithError(err).Error("failed to get beer from DB")
+		tea.Logger(r).WithError(err).Error("failed to get brewery from DB")
 		return tea.StatusError(500)
 	}
-	if beer == nil {
+	if brewery == nil {
 		return tea.StatusError(404)
 	}
 
-	return 200, beer
+	return 200, brewery
 }
