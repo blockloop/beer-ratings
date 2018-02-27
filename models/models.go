@@ -44,14 +44,15 @@ type Beer struct {
 
 // Brewery is a brewery
 type Brewery struct {
-	Address  `db:"-"`
-	ID       int64     `json:"id" db:"id"`
-	OwnerID  int64     `json:"owner_id" db:"owner_id"`
-	UUID     string    `json:"uuid" db:"uuid"`
-	Name     string    `json:"name" db:"name"`
-	Verified bool      `json:"verified" db:"verified"`
-	Created  time.Time `json:"created" db:"created"`
-	Modified time.Time `json:"modified" db:"modified"`
+	Address         `db:"-"`
+	ID              int64     `json:"id" db:"id"`
+	OwnerID         int64     `json:"owner_id" db:"owner_id"`
+	CreatedByUserID int64     `json:"created_by_user_id" db:"created_by_user_id"`
+	UUID            string    `json:"uuid" db:"uuid"`
+	Name            string    `json:"name" db:"name"`
+	Verified        bool      `json:"verified" db:"verified"`
+	Created         time.Time `json:"created" db:"created"`
+	Modified        time.Time `json:"modified" db:"modified"`
 }
 
 // Address is a location on the map

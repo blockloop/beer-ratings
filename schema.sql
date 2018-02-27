@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS breweries (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	uuid VARCHAR(36) NOT NULL,
 	owner_id INTEGER NOT NULL,
+	created_by_user_id INTEGER NOT NULL,
 	name VARCHAR(128) NOT NULL,
 	address_line_1 VARCHAR(128) NOT NULL DEFAULT '',
 	address_line_2 VARCHAR(128) NOT NULL DEFAULT '',
@@ -42,7 +43,8 @@ CREATE TABLE IF NOT EXISTS breweries (
 	verified BOOLEAN NOT NULL DEFAULT 0,
 	created DATETIME NOT NULL,
 	modified DATETIME NOT NULL,
-		FOREIGN KEY (owner_id) REFERENCES users (id)
+		FOREIGN KEY (owner_id) REFERENCES users (id),
+		FOREIGN KEY (created_by_user_id) REFERENCES users (id)
 );
 CREATE UNIQUE INDEX IF NOT EXISTS idx_breweries_uuid ON breweries(uuid);
 CREATE INDEX IF NOT EXISTS idx_breweries_name ON breweries(name);

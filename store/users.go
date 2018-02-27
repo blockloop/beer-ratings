@@ -52,9 +52,9 @@ func (u *users) LookupByEmail(ctx context.Context, email string) (*models.User, 
 	return &user, nil
 }
 
-func (u *users) LookupByID(ctx context.Context, id int64) (*models.User, error) {
+func (u *users) lookupUser(ctx context.Context, conditions sq.Eq) (*models.User, error) {
 	rows, err := selectUsers.
-		Where(sq.Eq{"id": id}).
+		Where(conditions).
 		Limit(1).
 		RunWith(u.db).
 		QueryContext(ctx)
@@ -74,6 +74,14 @@ func (u *users) LookupByID(ctx context.Context, id int64) (*models.User, error) 
 	}
 
 	return &user, nil
+}
+
+func (u *users) LookupByUUID(ctx context.Context, uuid string) (*models.User, error) {
+	return u.lookupUser(ctx, sq.Eq{"uuid": uuid})
+}
+
+func (u *users) LookupByID(ctx context.Context, id int64) (*models.User, error) {
+	return u.lookupUser(ctx, sq.Eq{"id": id})
 }
 
 func (u *users) LookupByEmailAndPassword(ctx context.Context, email string, passwordHash string) (*models.User, error) {

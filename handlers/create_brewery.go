@@ -3,8 +3,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/blockloop/beer_ratings/auth"
 	"github.com/blockloop/beer_ratings/models"
+	"github.com/blockloop/beer_ratings/request"
 	"github.com/blockloop/beer_ratings/store"
 	"github.com/blockloop/tea"
 )
@@ -25,8 +25,8 @@ func CreateBreweryHandler(db store.Breweries) http.HandlerFunc {
 
 // CreateBrewery creates a brewery with the provided data store
 func CreateBrewery(db store.Breweries, w http.ResponseWriter, r *http.Request) (int, interface{}) {
-	user := auth.FromRequest(r)
-	if user.Nobody() {
+	user := request.User(r.Context())
+	if user == nil {
 		return tea.StatusError(http.StatusForbidden)
 	}
 
@@ -36,9 +36,10 @@ func CreateBrewery(db store.Breweries, w http.ResponseWriter, r *http.Request) (
 	}
 
 	brewery, err := db.Create(r.Context(), user.ID, models.Brewery{
-		Name:    req.Name,
-		Address: req.Address,
-		OwnerID: req.OwnerID,
+		Name:            req.Name,
+		Address:         req.Address,
+		OwnerID:         req.OwnerID,
+		CreatedByUserID: user.ID,
 	})
 	if err != nil {
 		tea.Logger(r).WithError(err).Error("failed to create brewery")

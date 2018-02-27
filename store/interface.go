@@ -10,6 +10,7 @@ import (
 type Users interface {
 	LookupByEmail(ctx context.Context, email string) (*models.User, error)
 	LookupByID(ctx context.Context, id int64) (*models.User, error)
+	LookupByUUID(ctx context.Context, uuid string) (*models.User, error)
 	LookupByEmailAndPassword(ctx context.Context, email, passwordHash string) (*models.User, error)
 	Create(ctx context.Context, email, passwordHash string) (*models.User, error)
 }
