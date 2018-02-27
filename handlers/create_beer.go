@@ -29,7 +29,7 @@ type createBeerRequest struct {
 
 func CreateBeerHandler(beers store.Beers, breweries store.Breweries) http.HandlerFunc {
 	fn := func(w http.ResponseWriter, r *http.Request) (int, interface{}) {
-		var req createBeerRequest
+		req := new(createBeerRequest)
 		if err := tea.Body(r, req); err != nil {
 			return tea.Errorf(400, "bad request: %+v", err)
 		}

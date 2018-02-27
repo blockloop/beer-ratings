@@ -43,6 +43,9 @@ func (u *users) LookupByEmail(ctx context.Context, email string) (*models.User, 
 
 	var user models.User
 	if err := scan.Row(&user, rows); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "failed to scan user")
 	}
 
@@ -55,11 +58,18 @@ func (u *users) LookupByID(ctx context.Context, id int64) (*models.User, error) 
 		Limit(1).
 		RunWith(u.db).
 		QueryContext(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("could not select from db: %v", err)
+	if err == sql.ErrNoRows {
+		return nil, nil
 	}
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to execute query")
+	}
+
 	var user models.User
 	if err := scan.Row(&user, rows); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "failed to scan user")
 	}
 
@@ -81,6 +91,9 @@ func (u *users) LookupByEmailAndPassword(ctx context.Context, email string, pass
 
 	var user models.User
 	if err := scan.Row(&user, rows); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "failed to scan user")
 	}
 

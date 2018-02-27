@@ -12,7 +12,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-var breweryCols = scan.Columns(new(models.Brewery))
+var (
+	selectBreweriesCols = scan.Columns(new(models.Brewery))
+	selectBreweries     = sq.Select(selectBreweriesCols...).From("breweries")
+
+	insertBreweriesCols = scan.Columns(new(models.Brewery), "id")
+	insertBreweries     = sq.Insert("breweries").Columns(insertBreweriesCols...)
+)
 
 func NewBreweries(db *sql.DB) Breweries {
 	return &breweries{
@@ -31,9 +37,9 @@ func (b *breweries) Create(ctx context.Context, userID int64, brewery models.Bre
 	brewery.Modified = now
 	brewery.UUID = uuid.New()
 
-	res, err := sq.Insert("breweries").
-		Columns(breweryCols...).
-		Values(scan.Values(breweryCols, brewery)).
+	vals := scan.Values(insertBreweriesCols, &brewery)
+	res, err := insertBreweries.
+		Values(vals...).
 		RunWith(b.db).
 		ExecContext(ctx)
 	if err != nil {
@@ -57,9 +63,9 @@ func (b *breweries) ForBeer(ctx context.Context, beerID int64) (*models.Brewery,
 }
 
 func (b *breweries) Get(ctx context.Context, id int64) (*models.Brewery, error) {
-	rows, err := sq.Select(breweryCols...).
-		From("breweries").
+	rows, err := selectBreweries.
 		Where(sq.Eq{"id": id}).
+		Limit(1).
 		RunWith(b.db).
 		QueryContext(ctx)
 	if err != nil {
@@ -71,6 +77,9 @@ func (b *breweries) Get(ctx context.Context, id int64) (*models.Brewery, error) 
 
 	var brewery models.Brewery
 	if err := scan.Row(&brewery, rows); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, nil
+		}
 		return nil, errors.Wrap(err, "failed to scan brewery")
 	}
 

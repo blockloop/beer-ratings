@@ -18,7 +18,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username ON users(username);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_users_uuid ON users(uuid);
 
-INSERT INTO users (
+INSERT OR IGNORE INTO users (
         uuid, username, email, password_hash, verified, created, modified
 )
 VALUES (
@@ -53,6 +53,7 @@ CREATE TABLE IF NOT EXISTS beers (
 	uuid VARCHAR(36) NOT NULL,
 	brewery_id INTEGER NOT NULL,
 	name VARCHAR(128) NOT NULL,
+        avg_rating FLOAT NOT NULL DEFAULT 0.0,
 	description VARCHAR(1024) NOT NULL DEFAULT '',
 	created DATETIME NOT NULL,
 	modified DATETIME NOT NULL,

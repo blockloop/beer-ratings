@@ -21,15 +21,13 @@ func Register(mux muxer, db *store.Stores) {
 
 	// Beers
 	mux.Get(`/beers/{id}`, FindBeerHandler(db.Beers))
-
 	mux.Post("/brewery", CreateBreweryHandler(db.Breweries))
+	mux.Get("/brewery/{id}", FindBreweryHandler(db.Breweries))
+	mux.Post("/brewery/{brewery_id}/beers", CreateBeerHandler(db.Beers, db.Breweries))
 
-	mux.Get("/brewery/:id", FindBreweryHandler(db.Breweries))
-
-	// mux.Post("/brewery/:brewery_id/beers", factory.CreateBeer)
 	// Users
 	mux.Post("/users", CreateUserHandler(db.Users))
-	// r.Get("/users/:id", factory.GetUserByID)
+	mux.Get("/users/{id}", UserByIDHandler(db.Users))
 
 	// r.MethodFunc(http.MethodGet, "/ping", func(c boar.Context) error {
 	// 	return c.WriteJSON(http.StatusOK, boar.JSON{

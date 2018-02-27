@@ -37,7 +37,7 @@ type Beer struct {
 	UUID      string    `json:"uuid" db:"uuid"`
 	Name      string    `json:"name" db:"name"`
 	BreweryID int64     `json:"brewery_id" db:"brewery_id"`
-	AvgRating int8      `json:"avg_rating,omitempty" db:"avg_rating"`
+	AvgRating float64   `json:"avg_rating,omitempty" db:"avg_rating"`
 	Created   time.Time `json:"created" db:"created"`
 	Modified  time.Time `json:"modified" db:"modified"`
 }
